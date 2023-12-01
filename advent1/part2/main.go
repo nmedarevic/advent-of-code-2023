@@ -115,15 +115,11 @@ func findAllNumbers(line string, r *regexp.Regexp) []string {
 		var substring = line[i:len(line)]
 		match := r.FindString(substring)
 
-		// if elementExistsInStringArray(matches, match) {
-		// 	continue
-		// }
-
-		if line == "nine6kfpkqhkjzsknrldfcghcgkghnine" {
-			fmt.Println(match, substring)
+		if match == "" {
+			continue
 		}
 
-		if match == "" {
+		if len(matches) >= 1 && matches[len(matches)-1] == match {
 			continue
 		}
 
@@ -145,10 +141,7 @@ func getCallback(result *[]int) func(string) {
 
 		*result = append(*result, number)
 
-		if line == "nine6kfpkqhkjzsknrldfcghcgkghnine" {
-
-			fmt.Println("Line:", line, "\n", "Matches:", matches, "\n", "Matched numbers:", matchedNumbers, "\n", "Final number:", number)
-		}
+		fmt.Println("Line:", line, "\n", "Matches:", matches, "\n", "Matched numbers:", matchedNumbers, "\n", "Final number:", number)
 	}
 }
 
