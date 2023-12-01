@@ -92,8 +92,6 @@ func iterate(lines <-chan []string, cb func(string)) {
 	}
 }
 
-// func iterateThroughStringArrayChannel(lines <-chan []string, cb )
-
 func worker(wg *sync.WaitGroup, id int, lines <-chan []string, resultChanel chan<- []int) {
 	defer wg.Done()
 
@@ -103,24 +101,9 @@ func worker(wg *sync.WaitGroup, id int, lines <-chan []string, resultChanel chan
 
 	var result []int
 
-	// iterate(lines, )
 	var callback = addRegexToCallback(r, &result)
 
 	iterate(lines, callback)
-
-	// for task := range lines {
-	// 	for _, line := range task {
-	// 		fmt.Println(line)
-	// 		matches := r.FindAllString(line, -1)
-	// 		fmt.Println(matches)
-
-	// 		number := getLineNumber(matches)
-
-	// 		fmt.Println("Found number for", matches, "is", number)
-
-	// 		result = append(result, number)
-	// 	}
-	// }
 
 	fmt.Println("Worker", id, "finished!")
 

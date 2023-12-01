@@ -9,6 +9,8 @@ import (
 	"sync"
 )
 
+var regexPattern = "\\d|one|two|three|four|five|six|seven|eight|nine|ten"
+
 func loadInput() []string {
 	var filePath = "./input.txt"
 
@@ -35,10 +37,8 @@ func loadInput() []string {
 }
 
 func getLineNumber(numberMatches []string) int {
-	var resultNumber int = 0
-
 	if len(numberMatches) == 0 {
-		resultNumber = 0
+		return 0
 	}
 
 	if len(numberMatches) == 1 {
@@ -48,7 +48,7 @@ func getLineNumber(numberMatches []string) int {
 			number = 0
 		}
 
-		resultNumber = (number * 10) + number
+		return (number * 10) + number
 	}
 
 	if len(numberMatches) > 1 {
@@ -64,23 +64,91 @@ func getLineNumber(numberMatches []string) int {
 			secondNumber = 0
 		}
 
-		resultNumber = (firstNumber * 10) + secondNumber
+		return (firstNumber * 10) + secondNumber
 	}
 
-	return resultNumber
+	return 0
 }
 
-func addRegexToCallback(r *regexp.Regexp, result *[]int) func(string) {
+var numberMap = map[string]string{
+	"one":   "1",
+	"two":   "2",
+	"three": "3",
+	"four":  "4",
+	"five":  "5",
+	"six":   "6",
+	"seven": "7",
+	"eight": "8",
+	"nine":  "9",
+}
+
+func convertMatchesToNumbers(matches []string) []string {
+	var result []string
+
+	for _, match := range matches {
+		value, ok := numberMap[match]
+
+		if ok {
+			result = append(result, value)
+		} else {
+			result = append(result, match)
+		}
+	}
+
+	return result
+}
+
+func elementExistsInStringArray(array []string, element string) bool {
+	for _, arrayElement := range array {
+		if arrayElement == element {
+			return true
+		}
+	}
+
+	return false
+}
+
+func findAllNumbers(line string, r *regexp.Regexp) []string {
+	var matches []string
+
+	for i := 0; i < len(line); i++ {
+		var substring = line[i:len(line)]
+		match := r.FindString(substring)
+
+		// if elementExistsInStringArray(matches, match) {
+		// 	continue
+		// }
+
+		if line == "nine6kfpkqhkjzsknrldfcghcgkghnine" {
+			fmt.Println(match, substring)
+		}
+
+		if match == "" {
+			continue
+		}
+
+		matches = append(matches, match)
+	}
+
+	return matches
+}
+
+func getCallback(result *[]int) func(string) {
 	return func(line string) {
-		fmt.Println(line)
-		matches := r.FindAllString(line, -1)
-		fmt.Println(matches)
+		r := regexp.MustCompile(regexPattern)
 
-		number := getLineNumber(matches)
+		matches := findAllNumbers(line, r)
 
-		fmt.Println("Found number for", matches, "is", number)
+		matchedNumbers := convertMatchesToNumbers(matches)
+
+		number := getLineNumber(matchedNumbers)
 
 		*result = append(*result, number)
+
+		if line == "nine6kfpkqhkjzsknrldfcghcgkghnine" {
+
+			fmt.Println("Line:", line, "\n", "Matches:", matches, "\n", "Matched numbers:", matchedNumbers, "\n", "Final number:", number)
+		}
 	}
 }
 
@@ -92,35 +160,15 @@ func iterate(lines <-chan []string, cb func(string)) {
 	}
 }
 
-// func iterateThroughStringArrayChannel(lines <-chan []string, cb )
-
 func worker(wg *sync.WaitGroup, id int, lines <-chan []string, resultChanel chan<- []int) {
 	defer wg.Done()
 
 	fmt.Println("Worker", id, "started!")
 
-	r := regexp.MustCompile("\\d")
-
 	var result []int
 
-	// iterate(lines, )
-	var callback = addRegexToCallback(r, &result)
-
+	var callback = getCallback(&result)
 	iterate(lines, callback)
-
-	// for task := range lines {
-	// 	for _, line := range task {
-	// 		fmt.Println(line)
-	// 		matches := r.FindAllString(line, -1)
-	// 		fmt.Println(matches)
-
-	// 		number := getLineNumber(matches)
-
-	// 		fmt.Println("Found number for", matches, "is", number)
-
-	// 		result = append(result, number)
-	// 	}
-	// }
 
 	fmt.Println("Worker", id, "finished!")
 
@@ -165,8 +213,9 @@ func main() {
 		totalLinesProcessed += len(item)
 		lineNumbers = append(lineNumbers, item...)
 
-		fmt.Println("Result:", item)
 	}
+
+	fmt.Println("Result:", lineNumbers)
 
 	sum := 0
 
@@ -180,3 +229,10 @@ func main() {
 		fmt.Println("Not all lines processed!")
 	}
 }
+
+// 54522 - incorrect
+// 54538 - incorrect
+// 48360 - incorrect
+// 53316 - incorrect
+
+// Mozda? 54530
