@@ -1,6 +1,7 @@
 package main
 
 import (
+	"advent_helper/constants"
 	"bufio"
 	"fmt"
 	"os"
@@ -8,8 +9,6 @@ import (
 	"strconv"
 	"sync"
 )
-
-var regexPattern = "\\d|one|two|three|four|five|six|seven|eight|nine|ten"
 
 func loadInput() []string {
 	var filePath = "./input.txt"
@@ -70,23 +69,11 @@ func getLineNumber(numberMatches []string) int {
 	return 0
 }
 
-var numberMap = map[string]string{
-	"one":   "1",
-	"two":   "2",
-	"three": "3",
-	"four":  "4",
-	"five":  "5",
-	"six":   "6",
-	"seven": "7",
-	"eight": "8",
-	"nine":  "9",
-}
-
 func convertMatchesToNumbers(matches []string) []string {
 	var result []string
 
 	for _, match := range matches {
-		value, ok := numberMap[match]
+		value, ok := constants.NumberMap[match]
 
 		if ok {
 			result = append(result, value)
@@ -108,7 +95,7 @@ func elementExistsInStringArray(array []string, element string) bool {
 	return false
 }
 
-func findAllNumbers(line string, r *regexp.Regexp) []string {
+func scanStringForNumbers(line string, r *regexp.Regexp) []string {
 	var matches []string
 
 	for i := 0; i < len(line); i++ {
@@ -131,9 +118,9 @@ func findAllNumbers(line string, r *regexp.Regexp) []string {
 
 func getCallback(result *[]int) func(string) {
 	return func(line string) {
-		r := regexp.MustCompile(regexPattern)
+		r := regexp.MustCompile(constants.NumberRegexPattern)
 
-		matches := findAllNumbers(line, r)
+		matches := scanStringForNumbers(line, r)
 
 		matchedNumbers := convertMatchesToNumbers(matches)
 
