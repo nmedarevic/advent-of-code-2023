@@ -69,7 +69,7 @@ func getLineNumber(numberMatches []string) int {
 	return 0
 }
 
-func convertMatchesToNumbers(matches []string) []string {
+func convertNumbersAndNamesToDigits(matches []string) []string {
 	var result []string
 
 	for _, match := range matches {
@@ -83,16 +83,6 @@ func convertMatchesToNumbers(matches []string) []string {
 	}
 
 	return result
-}
-
-func elementExistsInStringArray(array []string, element string) bool {
-	for _, arrayElement := range array {
-		if arrayElement == element {
-			return true
-		}
-	}
-
-	return false
 }
 
 func scanStringForNumbers(line string, r *regexp.Regexp) []string {
@@ -122,7 +112,7 @@ func getCallback(result *[]int) func(string) {
 
 		matches := scanStringForNumbers(line, r)
 
-		matchedNumbers := convertMatchesToNumbers(matches)
+		matchedNumbers := convertNumbersAndNamesToDigits(matches)
 
 		number := getLineNumber(matchedNumbers)
 

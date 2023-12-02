@@ -1,3 +1,7 @@
 go 1.21.4
 
-use ./advent_helper
+use (
+	./advent_helper
+	./day1
+	./day2
+)

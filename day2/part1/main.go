@@ -1,36 +1,11 @@
 package main
 
 import (
-	"bufio"
+	"advent_helper/file_loader"
+	"advent_helper/workers"
 	"fmt"
-	"os"
 	"sync"
 )
-
-func loadInput() []string {
-	var filePath = "./input.txt"
-
-	readFile, err := os.Open(filePath)
-
-	defer readFile.Close()
-
-	if err != nil {
-		fmt.Println(err)
-
-		return []string{}
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split((bufio.ScanLines))
-
-	var fileLines []string
-
-	for fileScanner.Scan() {
-		fileLines = append(fileLines, fileScanner.Text())
-	}
-
-	return fileLines
-}
 
 func getCallback(result *[]int) func(string) {
 	return func(line string) {
@@ -38,36 +13,8 @@ func getCallback(result *[]int) func(string) {
 	}
 }
 
-func iterate(lines <-chan []string, cb func(string)) {
-	for task := range lines {
-		for _, line := range task {
-			cb(line)
-		}
-	}
-}
-
-func worker(wg *sync.WaitGroup, id int, lines <-chan []string, resultChanel chan<- []int) {
-	defer wg.Done()
-
-	fmt.Println("Worker", id, "started!")
-
-	var result []int
-
-	var callback = getCallback(&result)
-	iterate(lines, callback)
-
-	fmt.Println("Worker", id, "finished!")
-
-	resultChanel <- result
-}
-
-func monitorWorker(wg *sync.WaitGroup, cs chan []int) {
-	wg.Wait()
-	close(cs)
-}
-
 func main() {
-	var lines = loadInput()
+	var lines = file_loader.LoadLinesFromFile("./input.txt")
 
 	wg := &sync.WaitGroup{}
 	tasks := make(chan []string)
@@ -77,7 +24,7 @@ func main() {
 
 	for ; workerNumber < 10; workerNumber++ {
 		wg.Add(1)
-		go worker(wg, workerNumber, tasks, results)
+		go workers.Worker(wg, workerNumber, getCallback, tasks, results)
 	}
 
 	var batchOffset = 0
@@ -89,7 +36,7 @@ func main() {
 
 	close(tasks)
 
-	go monitorWorker(wg, results)
+	go workers.MonitorWorker(wg, results)
 
 	totalLinesProcessed := 0
 
@@ -98,7 +45,6 @@ func main() {
 	for item := range results {
 		totalLinesProcessed += len(item)
 		lineNumbers = append(lineNumbers, item...)
-
 	}
 
 	fmt.Println("Result:", lineNumbers)
