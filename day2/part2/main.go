@@ -35,9 +35,11 @@ var greenRegex = regexp.MustCompile(greenPattern)
 func parseLine(line string) (int, string) {
 	var gameAndCombos = strings.Split(line, ":")
 
-	gameIdString := numberRegex.FindString(gameAndCombos[0])
-
 	var allPlays = strings.Split(gameAndCombos[1], ";")
+
+	biggestRed := 0
+	biggestBlue := 0
+	biggestGreen := 0
 
 	for _, play := range allPlays {
 		redMatches := redRegex.FindString(play)
@@ -52,14 +54,20 @@ func parseLine(line string) (int, string) {
 		var blue = strings_helpers.StringToNumberDefaultToZero(blueNumberString)
 		var green = strings_helpers.StringToNumberDefaultToZero(greenNumberString)
 
-		if red > gameLimits.red || blue > gameLimits.blue || green > gameLimits.green {
-			return 0, "Invalid game"
+		if red > biggestRed {
+			biggestRed = red
+		}
+
+		if blue > biggestBlue {
+			biggestBlue = blue
+		}
+
+		if green > biggestGreen {
+			biggestGreen = green
 		}
 	}
 
-	var gameIdNumber = strings_helpers.StringToNumberAndPanic(gameIdString)
-
-	return gameIdNumber, ""
+	return biggestRed * biggestBlue * biggestGreen, ""
 }
 
 func getCallback(result *[]int) func(string) {
@@ -126,4 +134,4 @@ func main() {
 	}
 }
 
-// Result = 2563
+// Result = 70768
