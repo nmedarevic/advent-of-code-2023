@@ -17,7 +17,7 @@ type Number struct {
 	endPosition   Position
 }
 
-var specialCharsArray = []string{"#", "=", "/", "&", "%", "@", "$", "-", "*"}
+var specialCharsArray = []string{"#", "=", "/", "&", "%", "@", "$", "-", "*", "+"}
 
 var numbersAdjecentToChars = []Number{}
 
@@ -106,9 +106,6 @@ func main() {
 
 			// Check right
 			// If match is not on the last index
-			if string(line[match[0]:match[1]]) == "873" {
-				fmt.Println("873", match[0], match[1])
-			}
 			if match[1] < len(line) && isSpecialCharacter(line[match[1]]) {
 				// fmt.Println(string(lines[lineIndex][match[1]+1]))
 				saveNumber(line[match[0]:match[1]], lineIndex, match)
@@ -158,4 +155,5 @@ func main() {
 }
 
 // Attempt 2 = 474428 not correct
-// Attempt 3 - 520249
+// Attempt 3 - 520249 not correct
+// Attempt 4 - 539637 - correct!!!!
