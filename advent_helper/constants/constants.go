@@ -13,3 +13,15 @@ var NumberMap = map[string]string{
 }
 
 var NumberRegexPattern = "\\d|one|two|three|four|five|six|seven|eight|nine|ten"
+
+var SpecialChars = map[string]int{
+	"#": 35,
+	"=": 61,
+	"/": 47,
+	"&": 38,
+	"%": 37,
+	"@": 64,
+	"$": 36,
+	"-": 45,
+	"*": 42,
+}
