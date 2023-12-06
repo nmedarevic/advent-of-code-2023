@@ -21,7 +21,8 @@ var specialCharsArray = []string{"#", "=", "/", "&", "%", "@", "$", "-", "*", "+
 
 var numbersAdjecentToChars = []Number{}
 
-var numberRegex = regexp.MustCompile("\\d+")
+var numberRegex = regexp.MustCompile(`\d+`)
+var starRegex = regexp.MustCompile(`\*`)
 
 func isSpecialCharacter(value byte) bool {
 	valueString := string(value)
@@ -57,9 +58,7 @@ func saveNumber(numberString string, lineIndex int, match []int, numberArray *[]
 	fmt.Println("Added a number:", numberInt)
 }
 
-func main() {
-	var lines = file_loader.LoadLinesFromFile("./input.txt")
-
+func getNumbersNearChars(lines []string, outputArray *[]Number) *[]Number {
 	var numberOfLines = len(lines)
 
 	for lineIndex, line := range lines {
@@ -74,7 +73,7 @@ func main() {
 				// Check left diagonal up
 				if match[0] > 0 && isSpecialCharacter(lines[lineIndex-1][match[0]-1]) {
 					// fmt.Println(string(lines[lineIndex][match[0]-1]))
-					saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+					saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 					continue continueLoop
 				}
 
@@ -82,7 +81,7 @@ func main() {
 				for i := match[0]; i < match[1]; i++ {
 					if isSpecialCharacter(lines[lineIndex-1][i]) {
 						// fmt.Println(lines[lineIndex-1][i])
-						saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+						saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 						continue continueLoop
 					}
 				}
@@ -91,7 +90,7 @@ func main() {
 				// Only if the match is not on the last index
 				if match[1] < len(lines[lineIndex-1]) && isSpecialCharacter(lines[lineIndex-1][match[1]]) {
 					// fmt.Println(line[match[0]:match[1]], string(lines[lineIndex-1][match[1]]))
-					saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+					saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 					continue continueLoop
 				}
 			}
@@ -100,7 +99,7 @@ func main() {
 			// If match is not on the first index
 			if match[0] > 0 && isSpecialCharacter(line[match[0]-1]) {
 				// fmt.Println(string(lines[lineIndex][match[0]-1]))
-				saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+				saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 				continue continueLoop
 			}
 
@@ -108,7 +107,7 @@ func main() {
 			// If match is not on the last index
 			if match[1] < len(line) && isSpecialCharacter(line[match[1]]) {
 				// fmt.Println(string(lines[lineIndex][match[1]+1]))
-				saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+				saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 				continue continueLoop
 			}
 
@@ -118,7 +117,7 @@ func main() {
 				// Only if the match does not start at the first index
 				if match[0] > 0 && isSpecialCharacter(lines[lineIndex+1][match[0]-1]) {
 					// fmt.Println(string(lines[lineIndex+1][match[0]-1]))
-					saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+					saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 					continue continueLoop
 				}
 
@@ -127,7 +126,7 @@ func main() {
 				for i := match[0]; i < match[1]; i++ {
 					if isSpecialCharacter(lines[lineIndex+1][i]) {
 						// fmt.Println(string(lines[lineIndex+1][i]))
-						saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+						saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 						continue continueLoop
 					}
 				}
@@ -135,12 +134,20 @@ func main() {
 				// Check right diagonal dowm
 				if match[1] < len(lines[lineIndex+1]) && isSpecialCharacter(lines[lineIndex+1][match[1]]) {
 					// fmt.Println(string(lines[lineIndex+1][match[0]+1]))
-					saveNumber(line[match[0]:match[1]], lineIndex, match, &numbersAdjecentToChars)
+					saveNumber(line[match[0]:match[1]], lineIndex, match, outputArray)
 					continue continueLoop
 				}
 			}
 		}
 	}
+
+	return outputArray
+}
+
+func main() {
+	var lines = file_loader.LoadLinesFromFile("./input.txt")
+
+	numbersAdjecentToChars = *getNumbersNearChars(lines, &numbersAdjecentToChars)
 
 	fmt.Println("-------------------------")
 
