@@ -77,10 +77,8 @@ func getSeeds(fileContents *string) *[]int {
 	return &seedsNumbers
 }
 
-func main() {
-	var wholeFile = file_loader.LoadFileAsString("./input_short.txt")
-
-	var seedsNumbersInitial = *getSeeds(&wholeFile)
+func createSeedArray(fileContents *string) *[]int {
+	var seedsNumbersInitial = *getSeeds(fileContents)
 
 	var seedsNumbers = []int{}
 
@@ -92,6 +90,14 @@ func main() {
 			seedsNumbers = append(seedsNumbers, seedStart+i)
 		}
 	}
+
+	return &seedsNumbers
+}
+
+func main() {
+	var wholeFile = file_loader.LoadFileAsString("./input_short.txt")
+
+	var seedsNumbers = *createSeedArray(&wholeFile)
 
 	filtersMatches := filtersRegex.FindAllString(wholeFile, -1)
 
