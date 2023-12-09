@@ -31,10 +31,31 @@ func readLines(readFile *os.File) []string {
 	return fileLines
 }
 
+func readLinesIntoString(readFile *os.File) string {
+	fileScanner := bufio.NewScanner(readFile)
+	fileScanner.Split((bufio.ScanLines))
+
+	var fileContents string
+
+	for fileScanner.Scan() {
+		fileContents += fileScanner.Text() + "\n"
+	}
+
+	return fileContents
+}
+
 func LoadLinesFromFile(filePath string) []string {
 	readFile := openFile(filePath)
 
 	var fileLines = readLines(readFile)
 
 	return fileLines
+}
+
+func LoadFileAsString(filePath string) string {
+	readFile := openFile(filePath)
+
+	var fileContents = readLinesIntoString(readFile)
+
+	return fileContents
 }

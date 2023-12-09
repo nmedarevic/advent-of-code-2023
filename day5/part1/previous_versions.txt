@@ -1,0 +1,76 @@
+
+// var wholeFile = ""
+
+// for index, line := range lines {
+// 	if index == 0 {
+// 		wholeFile = line + "\n"
+// 		continue
+// 	}
+
+// 	wholeFile += line + "\n"
+// }
+
+
+
+
+
+
+
+
+
+
+// withAnotherSeed:
+// 	for _, seed := range seedsNumbers {
+// 		for _, filter := range filtersLevelOne {
+// 			if seed >= filter.input[0] && seed <= filter.input[1] {
+// 				seedsLevelOne = append(seedsLevelOne, filter.output[0]+(seed-filter.input[0]))
+
+// 				continue withAnotherSeed
+// 			}
+// 		}
+// 		seedsLevelOne = append(seedsLevelOne, seed)
+// 	}
+
+
+
+
+
+
+
+
+// fmt.Println("LVL 1", filtersLevelOne)
+
+// filtersNumbers := numberRegex.FindAllString(filtersMatches[0], -1)
+
+// var filtersLevelOne = []Filter{}
+// for i := 0; i < len(filtersNumbers); i += 3 {
+// 	var filterLength = strings_helpers.StringToNumberAndPanic(filtersNumbers[i+2])
+// 	filtersLevelOne = append(filtersLevelOne, Filter{
+// 		input: []int{
+// 			strings_helpers.StringToNumberAndPanic(filtersNumbers[i+1]),
+// 			strings_helpers.StringToNumberAndPanic(filtersNumbers[i+1]) + filterLength,
+// 		},
+// 		output: []int{
+// 			strings_helpers.StringToNumberAndPanic(filtersNumbers[i]),
+// 			strings_helpers.StringToNumberAndPanic(filtersNumbers[i]) + filterLength,
+// 		},
+// 	})
+// }
+
+
+
+
+
+
+
+
+
+
+	// matchesSeeds := seedsRegex.FindAllString(wholeFile, -1)
+	// seeds := numberRegex.FindAllString(matchesSeeds[0], -1)
+
+	// var seedsNumbers = []int{}
+
+	// for _, seedString := range seeds {
+	// 	seedsNumbers = append(seedsNumbers, strings_helpers.StringToNumberAndPanic(seedString))
+	// }
