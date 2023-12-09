@@ -1,6 +1,7 @@
 package main
 
 import (
+	"advent_helper/array_helpers"
 	"advent_helper/file_loader"
 	"advent_helper/strings_helpers"
 	"fmt"
@@ -77,7 +78,7 @@ func getSeeds(fileContents *string) *[]int {
 }
 
 func main() {
-	var wholeFile = file_loader.LoadFileAsString("./input_short.txt")
+	var wholeFile = file_loader.LoadFileAsString("./input.txt")
 
 	var seedsNumbers = *getSeeds(&wholeFile)
 
@@ -99,17 +100,7 @@ func main() {
 		outputSeeds = *passThroughFilter(outputSeeds, filter)
 	}
 
-	fmt.Println("Lowest number:", findLowestNumber(outputSeeds))
-}
+	fmt.Println("Lowest number:", array_helpers.FindLowestNumber(outputSeeds))
 
-func findLowestNumber(numberArray []int) int {
-	lowestNumber := numberArray[0]
-
-	for _, number := range numberArray {
-		if number < lowestNumber {
-			lowestNumber = number
-		}
-	}
-
-	return lowestNumber
+	// Correct = 3374647
 }

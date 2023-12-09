@@ -21,3 +21,15 @@ func FindIntersection(array1 *[]int, array2 *[]int) *[]int {
 
 	return &result
 }
+
+func FindLowestNumber(numberArray []int) int {
+	lowestNumber := numberArray[0]
+
+	for _, number := range numberArray {
+		if number < lowestNumber {
+			lowestNumber = number
+		}
+	}
+
+	return lowestNumber
+}
