@@ -9,12 +9,10 @@ import (
 
 var seedsRegexPattern = `seeds: (\d+[ ]?)+`
 var filtersRegexPattern = `(\-?\w+\-?)+ \w+:\n((\d+ ?)+\n)+`
-var onlyNumbersRegexPattern = `((\d+ ?)+\n)`
 var numbersRegexpattern = `\d+`
 
 var seedsRegex = regexp.MustCompile(seedsRegexPattern)
 var filtersRegex = regexp.MustCompile(filtersRegexPattern)
-var onlyNumbersRegex = regexp.MustCompile(onlyNumbersRegexPattern)
 var numberRegex = regexp.MustCompile(numbersRegexpattern)
 
 type Filter struct {
@@ -93,18 +91,25 @@ func main() {
 		filters[index] = append(filters[index], *createFilter(matches)...)
 	}
 
-	// fmt.Println("ALL FILTERS", filters)
+	var outputSeeds = make([]int, 0)
 
-	// for _, seed := range seedsNumbers {
+	outputSeeds = append(outputSeeds, seedsNumbers...)
 
-	// }
+	for _, filter := range filters {
+		outputSeeds = *passThroughFilter(outputSeeds, filter)
+	}
 
-	var filtersLevelOne = *createFilter(filtersMatches[0])
+	fmt.Println("Lowest number:", findLowestNumber(outputSeeds))
+}
 
-	var seedsLevelOne = []int{}
+func findLowestNumber(numberArray []int) int {
+	lowestNumber := numberArray[0]
 
-	seedsLevelOne = *passThroughFilter(seedsNumbers, filtersLevelOne)
+	for _, number := range numberArray {
+		if number < lowestNumber {
+			lowestNumber = number
+		}
+	}
 
-	fmt.Println(filtersLevelOne)
-	fmt.Println(seedsLevelOne)
+	return lowestNumber
 }
