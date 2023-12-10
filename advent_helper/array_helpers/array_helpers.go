@@ -33,3 +33,19 @@ func FindLowestNumber(numberArray []int) int {
 
 	return lowestNumber
 }
+
+type Number interface {
+	int | uint | int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64
+}
+
+func FindMin[T Number](numberArray []T) T {
+	lowestNumber := numberArray[0]
+
+	for _, number := range numberArray {
+		if number < lowestNumber {
+			lowestNumber = number
+		}
+	}
+
+	return lowestNumber
+}

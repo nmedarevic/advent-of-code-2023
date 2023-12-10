@@ -31,3 +31,13 @@ func StringToNumberAndPanic(numberString string) int {
 
 	return number
 }
+
+func StringToNumberAndPanic64(numberString string) int64 {
+	number, err := strconv.ParseInt(numberString, 10, 64)
+
+	if err != nil {
+		panic("Could not convert string to number")
+	}
+
+	return number
+}

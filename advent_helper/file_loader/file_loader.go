@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func openFile(filePath string) *os.File {
+func OpenFile(filePath string) *os.File {
 	readFile, err := os.Open(filePath)
 
 	if err != nil {
@@ -45,7 +45,7 @@ func readLinesIntoString(readFile *os.File) string {
 }
 
 func LoadLinesFromFile(filePath string) []string {
-	readFile := openFile(filePath)
+	readFile := OpenFile(filePath)
 
 	var fileLines = readLines(readFile)
 
@@ -53,7 +53,7 @@ func LoadLinesFromFile(filePath string) []string {
 }
 
 func LoadFileAsString(filePath string) string {
-	readFile := openFile(filePath)
+	readFile := OpenFile(filePath)
 
 	var fileContents = readLinesIntoString(readFile)
 
