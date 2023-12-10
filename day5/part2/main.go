@@ -4,8 +4,10 @@ import (
 	"advent_helper/array_helpers"
 	"advent_helper/file_loader"
 	"advent_helper/strings_helpers"
+	"advent_helper/workers"
 	"fmt"
 	"regexp"
+	"sync"
 )
 
 var seedsRegexPattern = `seeds: (\d+[ ]?)+`
@@ -86,7 +88,7 @@ func createSeedArray(fileContents *string) *[]int {
 		var seedStart = seedsNumbersInitial[i]
 		var seedEnd = seedsNumbersInitial[i+1]
 
-		for i := 0; i <= seedEnd; i++ {
+		for i := 0; i < seedEnd; i++ {
 			seedsNumbers = append(seedsNumbers, seedStart+i)
 		}
 	}
@@ -119,10 +121,59 @@ func main() {
 
 	outputSeeds = append(outputSeeds, seedsNumbers...)
 
-	for _, filter := range filters {
-		outputSeeds = *passThroughFilter(outputSeeds, filter)
+	wg := &sync.WaitGroup{}
+	tasks := make(chan []int)
+	results := make(chan []int)
+
+	var workerNumber int = 0
+	var batch = 2
+
+	for ; workerNumber < 10; workerNumber++ {
+		wg.Add(1)
+
+		go func(group *sync.WaitGroup, id int, intInput <-chan []int, resultChanel chan<- []int) {
+			defer group.Done()
+			fmt.Println("Worker", id, "started!")
+
+			var resultArray []int
+
+			for task := range intInput {
+
+				var taskResult = make([]int, 0)
+				taskResult = append(taskResult, task...)
+
+				for _, filter := range filters {
+					taskResult = *passThroughFilter(taskResult, filter)
+				}
+
+				resultArray = append(resultArray, taskResult...)
+			}
+
+			fmt.Println("Worker", id, "finished!", resultArray)
+
+			resultChanel <- resultArray
+		}(wg, workerNumber, tasks, results)
 	}
 
-	fmt.Println("Lowest number:", array_helpers.FindLowestNumber(outputSeeds))
+	for i := 0; i < len(outputSeeds); i += batch {
+		batchOffset := i + batch
+		if batchOffset > len(outputSeeds) {
+			batchOffset = len(outputSeeds)
+		}
+
+		tasks <- outputSeeds[i:batchOffset]
+	}
+
+	close(tasks)
+
+	go workers.MonitorWorker(wg, results)
+
+	var outputSeeds2 []int
+
+	for outputArray := range results {
+		outputSeeds2 = append(outputSeeds2, outputArray...)
+	}
+
+	fmt.Println("Lowest number:", array_helpers.FindLowestNumber((outputSeeds2)))
 
 }
