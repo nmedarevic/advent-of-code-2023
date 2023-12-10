@@ -20,7 +20,7 @@ type Filter struct {
 }
 
 func main() {
-	readFile := file_loader.OpenFile("./input.txt")
+	readFile := file_loader.OpenFile("./input_short.txt")
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -29,13 +29,20 @@ func main() {
 	fileScanner.Scan()
 	line := fileScanner.Text()
 
-	var seeds []uint64 = []uint64{}
+	var inputSeeds []uint64 = []uint64{}
 
 	matches := numberRegex.FindAllString(line, -1)
 
 	for _, m := range matches {
 		v, _ := strconv.ParseUint(m, 10, 64)
-		seeds = append(seeds, v)
+		inputSeeds = append(inputSeeds, v)
+	}
+
+	var seeds []uint64 = []uint64{}
+	for i := 0; i < len(inputSeeds); i += 2 {
+		for j := inputSeeds[i]; j < inputSeeds[i]+inputSeeds[i+1]; j++ {
+			seeds = append(seeds, j)
+		}
 	}
 
 	var filters = make([][]Filter, 7)
@@ -89,7 +96,7 @@ func main() {
 		// fmt.Println("seeds[index]")
 	}
 
-	// fmt.Println("Seeds", seeds)
+	// fmt.Println("seeds", seeds)
 
 	fmt.Println("Lowest number:", array_helpers.FindMin[uint64](seeds))
 }
