@@ -20,7 +20,7 @@ type Filter struct {
 }
 
 func main() {
-	readFile := file_loader.OpenFile("./input_short.txt")
+	readFile := file_loader.OpenFile("./input.txt")
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -52,6 +52,7 @@ func main() {
 		fileScanner.Scan()
 
 		filters[i] = make([]Filter, 0)
+
 		for fileScanner.Scan() {
 			line = fileScanner.Text()
 			if line == "" {
@@ -80,11 +81,9 @@ func main() {
 	}
 
 	for index := range seeds {
-
 	withNextFilterClass:
 		for _, filterClass := range filters {
 			for _, filter := range filterClass {
-
 				if seeds[index] >= filter.input[0] && seeds[index] <= filter.input[1] {
 					// fmt.Println("BEFORE", seeds[index], filter.input[0], filter.output[0])
 					seeds[index] = filter.output[0] + (seeds[index] - filter.input[0])
