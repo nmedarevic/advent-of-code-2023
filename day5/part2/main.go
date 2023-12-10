@@ -152,3 +152,5 @@ completeLoop:
 
 	// fmt.Println("Lowest number:", array_helpers.FindMin[uint64](seeds))
 }
+
+// 6082852
