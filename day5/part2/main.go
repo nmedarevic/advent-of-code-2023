@@ -1,7 +1,6 @@
 package main
 
 import (
-	"advent_helper/array_helpers"
 	"advent_helper/file_loader"
 	"bufio"
 	"fmt"
@@ -14,9 +13,13 @@ var numbersRegexpattern = `\d+`
 var numberRegex = regexp.MustCompile(numbersRegexpattern)
 
 type Filter struct {
-	input       []uint64
-	output      []uint64
-	filterIndex int
+	input  []uint64
+	output []uint64
+}
+
+type SeedRange struct {
+	start uint64
+	end   uint64
 }
 
 func main() {
@@ -38,12 +41,13 @@ func main() {
 		inputSeeds = append(inputSeeds, v)
 	}
 
-	var seeds []uint64 = []uint64{}
+	var seeds []SeedRange = []SeedRange{}
 	for i := 0; i < len(inputSeeds); i += 2 {
-		for j := inputSeeds[i]; j < inputSeeds[i]+inputSeeds[i+1]; j++ {
-			seeds = append(seeds, j)
-		}
+
+		seeds = append(seeds, SeedRange{start: inputSeeds[i], end: inputSeeds[i+1]})
 	}
+
+	fmt.Println("Seeds done:", seeds)
 
 	var filters = make([][]Filter, 7)
 
@@ -73,29 +77,78 @@ func main() {
 					output,
 					output + filterLength,
 				},
-				filterIndex: i,
 			}
 
 			filters[i] = append(filters[i], lineFilter)
 		}
 	}
 
-	for index := range seeds {
+	fmt.Println("Filters done:", filters)
+
+	var i uint64 = 0
+	var minimalValue uint64 = 0
+	var originalNumber uint64 = 0
+
+completeLoop:
+	for ; ; i++ {
+		originalNumber = i
+		minimalValue = i
+
+		var filterClassIndex int = len(filters) - 1
+		// fmt.Println("NEW START")
+		// Go from classes in reverse
 	withNextFilterClass:
-		for _, filterClass := range filters {
-			for _, filter := range filterClass {
-				if seeds[index] >= filter.input[0] && seeds[index] <= filter.input[1] {
-					// fmt.Println("BEFORE", seeds[index], filter.input[0], filter.output[0])
-					seeds[index] = filter.output[0] + (seeds[index] - filter.input[0])
-					// fmt.Println("AFTER", seeds[index])
+		for ; filterClassIndex >= 0; filterClassIndex-- {
+			// Go from filters in reverse
+			var filterIndex = len(filters[filterClassIndex]) - 1
+			for ; filterIndex >= 0; filterIndex-- {
+				if minimalValue >= filters[filterClassIndex][filterIndex].output[0] &&
+					minimalValue <= filters[filterClassIndex][filterIndex].output[1] {
+					// fmt.Println("Here", minimalValue, filters[filterClassIndex][filterIndex].input[0]+(minimalValue-filters[filterClassIndex][filterIndex].input[0]))
+					minimalValue = filters[filterClassIndex][filterIndex].input[0] + (minimalValue - filters[filterClassIndex][filterIndex].output[0])
 					continue withNextFilterClass
 				}
 			}
 		}
-		// fmt.Println("seeds[index]")
+
+		for _, seedRange := range seeds {
+			if minimalValue >= seedRange.start && minimalValue <= seedRange.start+seedRange.end {
+				// fmt.Println("AAAAA", minimalValue, seedRange)
+				break completeLoop
+			}
+		}
 	}
 
-	// fmt.Println("seeds", seeds)
+	fmt.Println(minimalValue, originalNumber)
 
-	fmt.Println("Lowest number:", array_helpers.FindMin[uint64](seeds))
+	// 	for _, filterClass := range filters {
+	// 		for _, filter := range filterClass {
+	// 			if seeds[index] >= filter.input[0] && seeds[index] <= filter.input[1] {
+	// 				// fmt.Println("BEFORE", seeds[index], filter.input[0], filter.output[0])
+	// 				seeds[index] = filter.output[0] + (seeds[index] - filter.input[0])
+	// 				// fmt.Println("AFTER", seeds[index])
+	// 				continue withNextFilterClass
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// for index := range seeds {
+	// withNextFilterClass:
+	// 	for _, filterClass := range filters {
+	// 		for _, filter := range filterClass {
+	// 			if seeds[index] >= filter.input[0] && seeds[index] <= filter.input[1] {
+	// 				// fmt.Println("BEFORE", seeds[index], filter.input[0], filter.output[0])
+	// 				seeds[index] = filter.output[0] + (seeds[index] - filter.input[0])
+	// 				// fmt.Println("AFTER", seeds[index])
+	// 				continue withNextFilterClass
+	// 			}
+	// 		}
+	// 	}
+	// 	// fmt.Println("seeds[index]")
+	// }
+
+	// // fmt.Println("seeds", seeds)
+
+	// fmt.Println("Lowest number:", array_helpers.FindMin[uint64](seeds))
 }
