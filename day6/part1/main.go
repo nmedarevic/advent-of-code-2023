@@ -13,7 +13,7 @@ var numbersRegexpattern = `\d+`
 var numberRegex = regexp.MustCompile(numbersRegexpattern)
 
 func main() {
-	readFile := file_loader.OpenFile("./input_short.txt")
+	readFile := file_loader.OpenFile("./input.txt")
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -42,10 +42,10 @@ func main() {
 	fmt.Println(times)
 	fmt.Println(distances)
 
-	var waysToWin []int = []int{0, 0, 0}
+	var waysToWin []int = make([]int, len(times))
 
-	for i := 0; i < 3; i++ {
-		for time := 0; time < times[i]; time++ {
+	for i := 0; i < len(times); i++ {
+		for time := 0; time <= times[i]; time++ {
 			var buttonTime = times[i] - time
 			var distance = buttonTime * (times[i] - buttonTime)
 			fmt.Println("button time", buttonTime, "distance", distance)
@@ -58,5 +58,12 @@ func main() {
 		fmt.Println("--------")
 	}
 
-	fmt.Println("All distances multiplied", waysToWin[0]*waysToWin[1]*waysToWin[2])
+	var product = 1
+
+	for _, item := range waysToWin {
+		product *= item
+	}
+	fmt.Println("All distances multiplied", product)
 }
+
+// Correct - 252000
