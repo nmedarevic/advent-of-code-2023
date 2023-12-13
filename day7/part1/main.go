@@ -4,20 +4,11 @@ import (
 	"advent_helper/file_loader"
 	"bufio"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 )
 
-var numbersRegexpattern = `\d+`
-var cardPattern = `[AKQJT98765432]{5}`
-
-var numberRegex = regexp.MustCompile(numbersRegexpattern)
-var cardRegex = regexp.MustCompile(cardPattern)
-
-var cardStrength = []string{"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
-
-var carMap = map[string]int{
+var cardMap = map[string]int{
 	"A": 14,
 	"K": 13,
 	"Q": 12,
@@ -34,8 +25,118 @@ var carMap = map[string]int{
 }
 
 type Hand struct {
-	bid   int
-	cards string
+	bid      int
+	strength int
+	cards    string
+	rank     int
+}
+
+func CalculateStrength(cards string) int {
+	strength := 0
+
+	var frequencyMap = map[string]int{}
+	for _, card := range cards {
+		frequencyMap[string(card)]++
+	}
+
+	for key, value := range frequencyMap {
+		if value == 5 {
+			return 6
+		}
+
+		if value == 4 {
+			return 5
+		}
+
+		if value == 3 {
+			hasTwoDifferentOnes := false
+
+			for _, value1 := range frequencyMap {
+				if value1 == value {
+					continue
+				}
+
+				// Full house
+				if value1 == 2 {
+					return 4
+				}
+
+				// Three of a kind
+				if value1 == 1 {
+					hasTwoDifferentOnes = true
+				}
+			}
+
+			// Three of a kind
+			if hasTwoDifferentOnes {
+				return 3
+			}
+		}
+
+		// Two pair
+		if value == 2 {
+			hasAnotherPair := false
+			for key1, value1 := range frequencyMap {
+				if key == key1 {
+					continue
+				}
+
+				if value1 == 2 {
+					hasAnotherPair = true
+				}
+			}
+
+			if hasAnotherPair {
+				return 2
+			}
+		}
+
+		// One pair
+		if value == 2 {
+			allAreOnes := false
+
+			for _, value1 := range frequencyMap {
+				if value1 == value {
+					continue
+				}
+				if value1 == 1 {
+					allAreOnes = true
+				}
+				if value1 != 1 {
+					allAreOnes = false
+				}
+			}
+
+			if allAreOnes {
+				strength = 1
+
+				continue
+			}
+		}
+
+		strength = 0
+	}
+
+	return strength
+}
+
+/*
+*
+1  - card 1 is stronger
+0  - cards are equal
+-1 - card 2 is stringer
+*
+*/
+func compareTwoElements(card1 string, card2 string) int {
+	for i := 0; i < 5; i++ {
+		if cardMap[string(card1[i])] > cardMap[string(card2[i])] {
+			return 1
+		} else if cardMap[string(card1[i])] < cardMap[string(card2[i])] {
+			return -1
+		}
+	}
+
+	return 0
 }
 
 func main() {
@@ -46,6 +147,7 @@ func main() {
 	fileScanner.Split((bufio.ScanLines))
 
 	var hands []Hand = []Hand{}
+
 	for {
 		fileScanner.Scan()
 		line := fileScanner.Text()
@@ -55,12 +157,54 @@ func main() {
 		}
 
 		result := strings.Split(line, " ")
-		fmt.Println(result)
 
 		bid, _ := strconv.Atoi(result[1])
+		// fmt.Println(result, bid)
 
-		hands = append(hands, Hand{bid: bid, cards: result[0]})
+		hands = append(hands, Hand{bid: bid, cards: result[0], strength: CalculateStrength(result[0])})
+
+		sizeOfHands := len(hands)
+
+		if sizeOfHands == 1 {
+			continue
+		}
+
+		if hands[sizeOfHands-2].strength > hands[sizeOfHands-1].strength {
+			hands[sizeOfHands-2], hands[sizeOfHands-1] = hands[sizeOfHands-1], hands[sizeOfHands-2]
+		}
+
+		if hands[sizeOfHands-2].strength == hands[sizeOfHands-1].strength {
+			comparison := compareTwoElements(hands[sizeOfHands-2].cards, hands[sizeOfHands-1].cards)
+
+			if comparison == 1 {
+				hands[sizeOfHands-2], hands[sizeOfHands-1] = hands[sizeOfHands-1], hands[sizeOfHands-2]
+			}
+		}
 	}
 
-	fmt.Println(hands)
+	for i := 2; i <= len(hands); i++ {
+		if hands[i-2].strength > hands[i-1].strength {
+			hands[i-2], hands[i-1] = hands[i-1], hands[i-2]
+
+		}
+
+		if hands[i-2].strength == hands[i-1].strength {
+			comparison := compareTwoElements(hands[i-2].cards, hands[i-1].cards)
+
+			if comparison == 1 {
+				hands[i-2], hands[i-1] = hands[i-1], hands[i-2]
+			}
+		}
+
+		hands[i-2].rank = i - 1
+		hands[i-1].rank = i
+	}
+
+	var result = 0
+
+	for _, hand := range hands {
+		fmt.Println(hand.cards, hand.rank)
+		result += hand.bid * hand.rank
+	}
+	fmt.Println(result)
 }
