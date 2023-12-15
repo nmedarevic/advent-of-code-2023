@@ -137,6 +137,30 @@ func compareTwoElements(card1 string, card2 string) int {
 	return 0
 }
 
+func partition(arr *[]Hand, low, high int) (*[]Hand, int) {
+	pivot := (*arr)[high]
+	i := low
+	for j := low; j < high; j++ {
+		if (*arr)[j].strength < pivot.strength || (*arr)[j].strength == pivot.strength && compareTwoElements((*arr)[j].cards, pivot.cards) == -1 {
+			(*arr)[i], (*arr)[j] = (*arr)[j], (*arr)[i]
+			i++
+		}
+	}
+
+	(*arr)[i], (*arr)[high] = (*arr)[high], (*arr)[i]
+	return arr, i
+}
+
+func quickSortHands(arr *[]Hand, low, high int) *[]Hand {
+	if low < high {
+		var p int
+		arr, p = partition(arr, low, high)
+		arr = quickSortHands(arr, low, p-1)
+		arr = quickSortHands(arr, p+1, high)
+	}
+	return arr
+}
+
 func main() {
 	readFile := file_loader.OpenFile("./input_short.txt")
 	defer readFile.Close()
@@ -157,7 +181,6 @@ func main() {
 		result := strings.Split(line, " ")
 
 		bid, _ := strconv.Atoi(result[1])
-		// fmt.Println(result, bid)
 
 		hands = append(hands, Hand{bid: bid, cards: result[0], strength: CalculateStrength(result[0])})
 
@@ -166,43 +189,21 @@ func main() {
 		if sizeOfHands == 1 {
 			continue
 		}
-
-		if hands[sizeOfHands-2].strength > hands[sizeOfHands-1].strength {
-			hands[sizeOfHands-2], hands[sizeOfHands-1] = hands[sizeOfHands-1], hands[sizeOfHands-2]
-		}
-
-		if hands[sizeOfHands-2].strength == hands[sizeOfHands-1].strength {
-			comparison := compareTwoElements(hands[sizeOfHands-2].cards, hands[sizeOfHands-1].cards)
-
-			if comparison == 1 {
-				hands[sizeOfHands-2], hands[sizeOfHands-1] = hands[sizeOfHands-1], hands[sizeOfHands-2]
-			}
-		}
 	}
 
-	for i := 2; i <= len(hands); i++ {
-		if hands[i-2].strength > hands[i-1].strength {
-			hands[i-2], hands[i-1] = hands[i-1], hands[i-2]
+	// fmt.Println(hands)
 
-		}
+	hands = *quickSortHands(&hands, 0, len(hands)-1)
 
-		if hands[i-2].strength == hands[i-1].strength {
-			comparison := compareTwoElements(hands[i-2].cards, hands[i-1].cards)
-
-			if comparison == 1 {
-				hands[i-2], hands[i-1] = hands[i-1], hands[i-2]
-			}
-		}
-
-		hands[i-2].rank = i - 1
-		hands[i-1].rank = i
-	}
+	// fmt.Println()
 
 	var result = 0
 
-	for _, hand := range hands {
-		fmt.Println(hand.cards, hand.rank)
-		result += hand.bid * hand.rank
+	for strength, hand := range hands {
+		fmt.Println(hand.cards, (strength + 1))
+		result += hand.bid * (strength + 1)
 	}
 	fmt.Println(result)
 }
+
+// 249911532 not correct
