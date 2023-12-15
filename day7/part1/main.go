@@ -95,8 +95,8 @@ func CalculateStrength(cards string) int {
 		if value == 2 {
 			allAreOnes := false
 
-			for _, value1 := range frequencyMap {
-				if value1 == value {
+			for key1, value1 := range frequencyMap {
+				if key1 == key {
 					continue
 				}
 				if value1 == 1 {
@@ -108,9 +108,7 @@ func CalculateStrength(cards string) int {
 			}
 
 			if allAreOnes {
-				strength = 1
-
-				continue
+				return 1
 			}
 		}
 
