@@ -12,7 +12,6 @@ var cardMap = map[string]int{
 	"A": 14,
 	"K": 13,
 	"Q": 12,
-	"J": 11,
 	"T": 10,
 	"9": 9,
 	"8": 8,
@@ -22,30 +21,59 @@ var cardMap = map[string]int{
 	"4": 4,
 	"3": 3,
 	"2": 2,
+	"J": 1,
+}
+
+var StrengthMap = map[string]int{
+	"FiveOfAKind":  6,
+	"FourOfAKind":  5,
+	"FullHouse":    4,
+	"ThreeOfAKind": 3,
+	"TwoPair":      2,
+	"OnePair":      1,
+	"HighCard":     0,
 }
 
 type Hand struct {
 	bid      int
 	strength int
 	cards    string
-	rank     int
 }
 
 func CalculateStrength(cards string) int {
-	strength := 0
-
+	strength := StrengthMap["HighCard"]
+	// fmt.Println(cards)
 	var frequencyMap = map[string]int{}
+
 	for _, card := range cards {
 		frequencyMap[string(card)]++
 	}
 
-	for key, value := range frequencyMap {
-		if value == 5 {
-			return 6
+	// fmt.Println(frequencyMap)
+
+	// Add to all the number of Js
+	for key := range frequencyMap {
+		if key == "J" {
+			continue
 		}
 
+		frequencyMap[key] += frequencyMap["J"]
+	}
+
+	// fmt.Println(frequencyMap)
+
+	for key, value := range frequencyMap {
+		// fmt.Println(key, value)
+		// Five of a kind
+		if value == 5 {
+			strength = StrengthMap["FiveOfAKind"]
+			// return StrengthMap["FiveOfAKind"]
+		}
+
+		// Four of a kind
 		if value == 4 {
-			return 5
+			strength = StrengthMap["FourOfAKind"]
+			// return StrengthMap["FourOfAKind"]
 		}
 
 		if value == 3 {
@@ -57,8 +85,9 @@ func CalculateStrength(cards string) int {
 				}
 
 				// Full house
-				if value1 == 2 {
-					return 4
+				if value1 == 2 && StrengthMap["FullHouse"] > strength {
+					strength = StrengthMap["FullHouse"]
+					// return StrengthMap["FullHouse"]
 				}
 
 				// Three of a kind
@@ -68,8 +97,8 @@ func CalculateStrength(cards string) int {
 			}
 
 			// Three of a kind
-			if hasTwoDifferentOnes {
-				return 3
+			if hasTwoDifferentOnes && StrengthMap["ThreeOfAKind"] > strength {
+				strength = StrengthMap["ThreeOfAKind"]
 			}
 		}
 
@@ -86,8 +115,8 @@ func CalculateStrength(cards string) int {
 				}
 			}
 
-			if hasAnotherPair {
-				return 2
+			if hasAnotherPair && StrengthMap["TwoPair"] > strength {
+				strength = StrengthMap["TwoPair"]
 			}
 		}
 
@@ -107,14 +136,14 @@ func CalculateStrength(cards string) int {
 				}
 			}
 
-			if allAreOnes {
-				return 1
+			if allAreOnes && StrengthMap["OnePair"] > strength {
+				strength = StrengthMap["OnePair"]
+				// return StrengthMap["OnePair"]
 			}
 		}
-
-		strength = 0
 	}
 
+	// fmt.Println(strength)
 	return strength
 }
 
@@ -162,7 +191,7 @@ func quickSortHands(arr *[]Hand, low, high int) *[]Hand {
 }
 
 func main() {
-	readFile := file_loader.OpenFile("./input.txt")
+	readFile := file_loader.OpenFile("./input_short.txt")
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)

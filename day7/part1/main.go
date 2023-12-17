@@ -28,7 +28,6 @@ type Hand struct {
 	bid      int
 	strength int
 	cards    string
-	rank     int
 }
 
 func CalculateStrength(cards string) int {
