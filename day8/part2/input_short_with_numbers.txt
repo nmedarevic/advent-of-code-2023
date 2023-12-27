@@ -1,0 +1,10 @@
+LR
+
+TVA = (WEB, XXX)
+WEB = (XXX, BFZ)
+BFZ = (WEB, XXX)
+KJA = (KAB, XXX)
+KAB = (FSC, FSC)
+FSC = (CAZ, CAZ)
+CAZ = (KAB, KAB)
+XXX = (XXX, XXX)
