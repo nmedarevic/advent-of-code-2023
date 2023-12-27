@@ -13,8 +13,6 @@ type Node struct {
 	R     *Node
 }
 
-var nodeMap = make(map[string]*Node)
-
 var regexMatcher = regexp.MustCompile(`[A-Z]{3}`)
 
 func createNode(value string) *Node {
@@ -29,10 +27,8 @@ func upsertNodeToMap(value string, nodeMap *map[string]*Node) {
 	}
 }
 
-func main() {
-	// readFile := file_loader.OpenFile("./input_short_short.txt")
-	// readFile := file_loader.OpenFile("./input_short_longer.txt")
-	readFile := file_loader.OpenFile("./input.txt")
+func ExtractNodeMapFromFile(filePath string) (*map[string]*Node, *Node, string) {
+	readFile := file_loader.OpenFile(filePath)
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -46,6 +42,8 @@ func main() {
 
 	// Step over an empty line
 	fileScanner.Scan()
+
+	var nodeMap = make(map[string]*Node)
 	// Gets all the nodes
 	for {
 		fileScanner.Scan()
@@ -69,18 +67,20 @@ func main() {
 		nodeMap[matches[0]].R = nodeMap[matches[2]]
 	}
 
-	// for _, item := range nodeMap {
-	// 	fmt.Println(item.value, item.L.value, item.R.value)
-	// }
+	return &nodeMap, head, instructions
+}
 
-	// fmt.Println(instructions)
+func main() {
+	// nodeMap, head, instructions := ExtractNodeMapFromFile("./input_short_short.txt")
+	nodeMap, head, instructions := ExtractNodeMapFromFile("./input_short_longer.txt")
+	// nodeMap, head, instructions := ExtractNodeMapFromFile("./input.txt")
 
-	fmt.Println(findNode(head, instructions, 0))
+	fmt.Println(FindNode(head, instructions, 0, nodeMap))
 }
 
 var endString string = "ZZZ"
 
-func findNode(head *Node, instructions string, stepCount int) int {
+func FindNode(head *Node, instructions string, stepCount int, nodeMap *map[string]*Node) int {
 	if head.value == endString {
 		return stepCount
 	}
@@ -98,9 +98,9 @@ func findNode(head *Node, instructions string, stepCount int) int {
 		// fmt.Println(head.value)
 
 		if head.value == endString {
-			return i + stepCount
+			return i + stepCount + 1
 		}
 	}
 
-	return findNode(head, instructions, stepCount+1+len(instructions))
+	return FindNode(head, instructions, stepCount+len(instructions), nodeMap)
 }
