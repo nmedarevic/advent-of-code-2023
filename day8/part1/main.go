@@ -14,6 +14,7 @@ type Node struct {
 }
 
 var regexMatcher = regexp.MustCompile(`[A-Z]{3}`)
+var endString string = "ZZZ"
 
 func createNode(value string) *Node {
 	return &Node{value: value, L: nil, R: nil}
@@ -70,16 +71,6 @@ func ExtractNodeMapFromFile(filePath string) (*map[string]*Node, *Node, string) 
 	return &nodeMap, head, instructions
 }
 
-func main() {
-	// nodeMap, head, instructions := ExtractNodeMapFromFile("./input_short_short.txt")
-	nodeMap, head, instructions := ExtractNodeMapFromFile("./input_short_longer.txt")
-	// nodeMap, head, instructions := ExtractNodeMapFromFile("./input.txt")
-
-	fmt.Println(FindNode(head, instructions, 0, nodeMap))
-}
-
-var endString string = "ZZZ"
-
 func FindNode(head *Node, instructions string, stepCount int, nodeMap *map[string]*Node) int {
 	if head.value == endString {
 		return stepCount
@@ -100,7 +91,20 @@ func FindNode(head *Node, instructions string, stepCount int, nodeMap *map[strin
 		if head.value == endString {
 			return i + stepCount + 1
 		}
+
+		if i == len(instructions)-1 {
+
+			stepCount += i + 1
+			fmt.Println("AGAIN", stepCount)
+			i = -1
+		}
 	}
 
-	return FindNode(head, instructions, stepCount+len(instructions), nodeMap)
+	return stepCount + 1
+}
+
+func main() {
+	nodeMap, head, instructions := ExtractNodeMapFromFile("./input.txt")
+
+	fmt.Println(FindNode(head, instructions, 0, nodeMap))
 }
