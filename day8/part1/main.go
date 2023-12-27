@@ -17,8 +17,21 @@ var nodeMap = make(map[string]*Node)
 
 var regexMatcher = regexp.MustCompile(`[A-Z]{3}`)
 
+func createNode(value string) *Node {
+	return &Node{value: value, L: nil, R: nil}
+}
+
+func upsertNodeToMap(value string, nodeMap *map[string]*Node) {
+	_, ok := (*nodeMap)[value]
+
+	if !ok {
+		(*nodeMap)[value] = createNode(value)
+	}
+}
+
 func main() {
-	readFile := file_loader.OpenFile("./input_short_short.txt")
+	// readFile := file_loader.OpenFile("./input_short_short.txt")
+	readFile := file_loader.OpenFile("./input_short_longer.txt")
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -42,29 +55,10 @@ func main() {
 		}
 
 		var matches = regexMatcher.FindAllString(line, -1)
-		fmt.Println(regexMatcher.FindAllString(line, -1))
 
-		_, ok := nodeMap[matches[0]]
-
-		if !ok {
-			nodeMap[matches[0]] = &Node{value: matches[0], L: nil, R: nil}
-
-			fmt.Println(nodeMap[matches[0]])
-		}
-
-		_, ok1 := nodeMap[matches[1]]
-
-		if !ok1 {
-			nodeMap[matches[1]] = &Node{value: matches[1], L: nil, R: nil}
-			fmt.Println(nodeMap[matches[1]])
-		}
-
-		_, ok2 := nodeMap[matches[2]]
-
-		if !ok2 {
-			nodeMap[matches[2]] = &Node{value: matches[2], L: nil, R: nil}
-			fmt.Println(nodeMap[matches[2]])
-		}
+		upsertNodeToMap(matches[0], &nodeMap)
+		upsertNodeToMap(matches[1], &nodeMap)
+		upsertNodeToMap(matches[2], &nodeMap)
 
 		if head == nil {
 			head = nodeMap[matches[0]]
