@@ -31,7 +31,8 @@ func upsertNodeToMap(value string, nodeMap *map[string]*Node) {
 
 func main() {
 	// readFile := file_loader.OpenFile("./input_short_short.txt")
-	readFile := file_loader.OpenFile("./input_short_longer.txt")
+	// readFile := file_loader.OpenFile("./input_short_longer.txt")
+	readFile := file_loader.OpenFile("./input.txt")
 	defer readFile.Close()
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -41,7 +42,7 @@ func main() {
 
 	// Get the instructions
 	fileScanner.Scan()
-	fileScanner.Text()
+	instructions := fileScanner.Text()
 
 	// Step over an empty line
 	fileScanner.Scan()
@@ -68,7 +69,38 @@ func main() {
 		nodeMap[matches[0]].R = nodeMap[matches[2]]
 	}
 
-	for _, item := range nodeMap {
-		fmt.Println(item.value, item.L.value, item.R.value)
+	// for _, item := range nodeMap {
+	// 	fmt.Println(item.value, item.L.value, item.R.value)
+	// }
+
+	// fmt.Println(instructions)
+
+	fmt.Println(findNode(head, instructions, 0))
+}
+
+var endString string = "ZZZ"
+
+func findNode(head *Node, instructions string, stepCount int) int {
+	if head.value == endString {
+		return stepCount
 	}
+
+	var left = byte('L')
+	var right = byte('R')
+
+	for i := 0; i < len(instructions); i++ {
+		if instructions[i] == left {
+			head = head.L
+		} else if instructions[i] == right {
+			head = head.R
+		}
+
+		// fmt.Println(head.value)
+
+		if head.value == endString {
+			return i + stepCount
+		}
+	}
+
+	return findNode(head, instructions, stepCount+1+len(instructions))
 }
