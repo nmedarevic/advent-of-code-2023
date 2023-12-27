@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -74,4 +75,33 @@ func TestQQQJA(t *testing.T) {
 	if CalculateStrength("QQQJA") != StrengthMap["FourOfAKind"] {
 		t.Error("QQQJA should be ", StrengthMap["FourOfAKind"])
 	}
+}
+
+func Test66KKK(t *testing.T) {
+	if CalculateStrength("66KKK") != StrengthMap["FullHouse"] {
+		t.Error("66KKK should be ", StrengthMap["FullHouse"])
+	}
+}
+
+func TestAABBJ(t *testing.T) {
+	fmt.Println(CalculateStrength("AABBJ"))
+	if CalculateStrength("AABBJ") != StrengthMap["FullHouse"] {
+		t.Error("AABBJ should be ", StrengthMap["FullHouse"])
+	}
+}
+
+func TestJ1234(t *testing.T) {
+	fmt.Println(CalculateStrength("4T48J"))
+	if CalculateStrength("4T48J") != StrengthMap["OnePair"] {
+		t.Error("4T48J should be ", StrengthMap["OnePair"])
+	}
+}
+
+func TestCompare(t *testing.T) {
+	fmt.Println(CalculateStrength("aabbJ"))
+	// fmt.Println(CalculateStrength("2JJJJ"))
+	// fmt.Println(CompareTwoElements("KTJJT", "2JJJJ"))
+	// if CalculateStrength("4T48J") != StrengthMap["OnePair"] {
+	// 	t.Error("4T48J should be ", StrengthMap["OnePair"])
+	// }
 }
