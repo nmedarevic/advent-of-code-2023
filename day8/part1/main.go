@@ -68,6 +68,10 @@ func ExtractNodeMapFromFile(filePath string) (*map[string]*Node, *Node, string) 
 		nodeMap[matches[0]].R = nodeMap[matches[2]]
 	}
 
+	if head.value != "AAA" {
+		head = nodeMap["AAA"]
+	}
+
 	return &nodeMap, head, instructions
 }
 
@@ -93,9 +97,7 @@ func FindNode(head *Node, instructions string, stepCount int, nodeMap *map[strin
 		}
 
 		if i == len(instructions)-1 {
-
 			stepCount += i + 1
-			fmt.Println("AGAIN", stepCount)
 			i = -1
 		}
 	}
