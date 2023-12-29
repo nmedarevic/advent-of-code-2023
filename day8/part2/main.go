@@ -8,9 +8,10 @@ import (
 )
 
 type Node struct {
-	value string
-	L     *Node
-	R     *Node
+	value    string
+	L        *Node
+	R        *Node
+	endIndex int
 }
 
 var regexMatcher = regexp.MustCompile(`[A-Z]{3}`)
@@ -20,7 +21,7 @@ var right byte = byte('R')
 var endLetter byte = byte('Z')
 
 func createNode(value string) *Node {
-	return &Node{value: value, L: nil, R: nil}
+	return &Node{value: value, L: nil, R: nil, endIndex: 0}
 }
 
 func upsertNodeToMap(value string, nodeMap *map[string]*Node) {
@@ -75,14 +76,42 @@ func ExtractNodeMapFromFile(filePath string) (*map[string]*Node, *[]*Node, strin
 		}
 	}
 
+	// sort.SliceStable(heads, func(i, j int) bool {
+	// 	return heads[i].value < heads[j].value
+	// })
+
 	return &nodeMap, &heads, instructions
+}
+
+func OneHeadEndsWithLetter(head *Node, value byte) bool {
+	return (*head).value[2] == value
+}
+
+func MarkHeadEndingWithLetter(heads *[](*Node), value byte, currentStep int) {
+	for _, head := range *heads {
+		if head.endIndex == 0 && head.value[2] == value {
+			head.endIndex = currentStep + 1
+		}
+	}
+}
+
+func AllHeadsFoundEnding(heads *[](*Node)) bool {
+	var result bool = true
+
+	for _, head := range *heads {
+		if head.endIndex == 0 {
+			result = false
+		}
+	}
+
+	return result
 }
 
 func HeadsEndWithLetter(heads *[](*Node), value byte) bool {
 	var result bool = true
 
 	for _, head := range *heads {
-		if head.value[len(head.value)-1] != value {
+		if head.value[2] != value {
 			result = false
 		}
 	}
@@ -92,6 +121,10 @@ func HeadsEndWithLetter(heads *[](*Node), value byte) bool {
 
 func moveHeads(heads *[](*Node), instruction byte) {
 	for headIndex := 0; headIndex < len(*heads); headIndex++ {
+		if (*heads)[headIndex].endIndex != 0 {
+			continue
+		}
+
 		if instruction == left {
 			(*heads)[headIndex] = (*heads)[headIndex].L
 		} else if instruction == right {
@@ -115,19 +148,34 @@ func FindNode(heads *[](*Node), instructions string, stepCount int, nodeMap *map
 	}
 
 	for i := 0; i < len(instructions); i++ {
+		// printHeads(heads)
 		moveHeads(heads, instructions[i])
+		// printHeads(heads)
 
-		printHeads(heads)
+		MarkHeadEndingWithLetter(heads, endLetter, stepCount+i)
+		// if HeadsEndWithLetter(heads, endLetter) {
+		// 	return i + stepCount + 1
+		// }
 
-		if HeadsEndWithLetter(heads, endLetter) {
-			return i + stepCount + 1
+		if AllHeadsFoundEnding(heads) {
+			var integers []int = []int{}
+
+			for _, head := range *heads {
+				fmt.Println(head.value, head.endIndex)
+				integers = append(integers, head.endIndex)
+			}
+			return LCM(integers[0], integers[1], integers[2:]...)
+
+			break
+			// fmt.Append(integers)
 		}
 
 		if i == len(instructions)-1 {
 			stepCount += i + 1
 			i = -1
 
-			fmt.Println("stepCount", stepCount)
+			// printHeads(heads)
+			// fmt.Println("stepCount", stepCount)
 		}
 	}
 
@@ -136,6 +184,29 @@ func FindNode(heads *[](*Node), instructions string, stepCount int, nodeMap *map
 
 func main() {
 	nodeMap, heads, instructions := ExtractNodeMapFromFile("./input.txt")
-
+	printHeads(heads)
 	fmt.Println(FindNode(heads, instructions, 0, nodeMap))
 }
+
+// greatest common divisor (GCD) via Euclidean algorithm
+func GCD(a, b int) int {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
+}
+
+// find Least Common Multiple (LCM) via GCD
+func LCM(a, b int, integers ...int) int {
+	result := a * b / GCD(a, b)
+
+	for i := 0; i < len(integers); i++ {
+		result = LCM(result, integers[i])
+	}
+
+	return result
+}
+
+//9858474970153 correct
