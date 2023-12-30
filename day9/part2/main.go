@@ -46,10 +46,8 @@ func main() {
 		matrix = append(matrix, inputArrayNumbers)
 
 		for {
-			// fmt.Println(matrix[len(matrix)-1], len(matrix), matrix)
 			outputArray := calculateResultArray(&matrix[len(matrix)-1], &matrix)
 			matrix = append(matrix, *outputArray)
-			// fmt.Println(matrix[len(matrix)-1], len(matrix), matrix)
 
 			if isEndCondition(outputArray) {
 				break
@@ -58,9 +56,6 @@ func main() {
 
 		endItemResult := calculateEndRowResult(&matrix)
 		collectiveResult += endItemResult
-		// fmt.Println(matrix)
-		// fmt.Println(endItemResult)
-		// break
 	}
 
 	fmt.Println(collectiveResult)
@@ -72,7 +67,7 @@ func calculateEndRowResult(matrix *[][]int) int {
 	endItemArray = append(endItemArray, 0)
 
 	for rowIndex := len(*matrix) - 1; rowIndex >= 0; rowIndex-- {
-		endItemArray = append(endItemArray, endItemArray[len(endItemArray)-1]+(*matrix)[rowIndex][len((*matrix)[rowIndex])-1])
+		endItemArray = append(endItemArray, (*matrix)[rowIndex][0]-endItemArray[len(endItemArray)-1])
 		endItemResult += endItemArray[len(endItemArray)-1]
 	}
 
@@ -114,8 +109,4 @@ func calculateResultArray(input *[]int, matrix *[][]int) *[]int {
 	return &output
 }
 
-// 1930716578 not correct
-// 1909895000 not correct
-// 1927176310 // not correct
-// 684821788 <- probably not
-// 1904165718 - CORRECT
+// 964 - Correct answer
