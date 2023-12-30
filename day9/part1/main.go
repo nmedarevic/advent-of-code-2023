@@ -8,11 +8,11 @@ import (
 	"strconv"
 )
 
-var numberPattern = "\\d+"
+var numberPattern = "-?\\d+"
 var numberRegex = regexp.MustCompile(numberPattern)
 
 func main() {
-	filePath := "./input_short.txt"
+	filePath := "./input.txt"
 	readFile := file_loader.OpenFile(filePath)
 	defer readFile.Close()
 
@@ -51,15 +51,16 @@ func main() {
 			matrix = append(matrix, *outputArray)
 			// fmt.Println(matrix[len(matrix)-1], len(matrix), matrix)
 
-			if arrayHasAllZeoros(outputArray) {
+			if isEndCondition(outputArray) {
 				break
 			}
 		}
 
 		endItemResult := calculateEndRowResult(&matrix)
 		collectiveResult += endItemResult
-
-		fmt.Println(endItemResult)
+		// fmt.Println(matrix)
+		// fmt.Println(endItemResult)
+		// break
 	}
 
 	fmt.Println(collectiveResult)
@@ -70,8 +71,7 @@ func calculateEndRowResult(matrix *[][]int) int {
 	endItemArray := make([]int, 0)
 	endItemArray = append(endItemArray, 0)
 
-	for rowIndex := len(*matrix) - 2; rowIndex >= 0; rowIndex-- {
-		// fmt.Println(matrix[rowIndex])
+	for rowIndex := len(*matrix) - 1; rowIndex >= 0; rowIndex-- {
 		endItemArray = append(endItemArray, endItemArray[len(endItemArray)-1]+(*matrix)[rowIndex][len((*matrix)[rowIndex])-1])
 		endItemResult += endItemArray[len(endItemArray)-1]
 	}
@@ -79,9 +79,11 @@ func calculateEndRowResult(matrix *[][]int) int {
 	return endItemArray[len(endItemArray)-1]
 }
 
-func arrayHasAllZeoros(input *[]int) bool {
+func isEndCondition(input *[]int) bool {
+	element := (*input)[0]
+
 	for _, item := range *input {
-		if item != 0 {
+		if item != element {
 			return false
 		}
 	}
@@ -90,24 +92,30 @@ func arrayHasAllZeoros(input *[]int) bool {
 }
 
 func calculateResultArray(input *[]int, matrix *[][]int) *[]int {
-	// (*matrix) = append((*matrix), []int{})
 	var output = make([]int, 0)
 
-	// currentLine := len(*matrix) - 1
-
 	var difference = 0
+	var firstItem = 0
+	var secondItem = 0
 
 	for i := 0; i < len(*input); i++ {
 		if (i) == len(*input)-1 {
 			break
 		}
 
-		difference = (*input)[i+1] - (*input)[i]
+		secondItem = (*input)[i+1]
+		firstItem = (*input)[i]
+
+		difference = secondItem - firstItem
 
 		output = append(output, difference)
 	}
 
-	// fmt.Println((*matrix)[currentLine])
-
 	return &output
 }
+
+// 1930716578 not correct
+// 1909895000 not correct
+// 1927176310 // not correct
+// 684821788 <- probably not
+// 1904165718 - CORRECT
